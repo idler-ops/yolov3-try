@@ -18,7 +18,7 @@ from utils.parse_config import *
 import os
 import sys
 import time
-import datatime
+import datetime
 import argparse
 import tqdm
 
@@ -28,6 +28,7 @@ from torchvision import datasets
 from torchvision import transforms
 from torch.autograd import Variable
 import torch.optim as optim
+
 
 #1.定义评估函数evaluate()
 def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size):
