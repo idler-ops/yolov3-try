@@ -33,7 +33,7 @@ import torch.optim as optim
 #1.定义评估函数evaluate()
 def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size):
   #输入模型model，拟评估数据集地址valid_path，iou_thres阈值，conf_thres阈值，nms_thres阈值，img_size，batch_size
-  model.eval() #设置为验证模式
+  model.eval() #设置为评估模式
 
   #加载数据
   dataset = ListDataset(path, img_size=img_size, augment=False, multiscale=False)
@@ -42,7 +42,7 @@ def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size
       batch_size=batch_size,
       shuffle=False,
       num_workers=1,
-      collate_fn=dataset.collate_fn
+      collate_fn=dataset.collate_fn,
   )
 
   Tensor = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
@@ -74,7 +74,7 @@ def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size
     sample_metrics += get_batch_statistics(
       outputs,
       targets,
-      iou_threshold=iou_thres
+      iou_threshold=iou_thres,
     ) #评估一个batch样本的性能
 
   #Concatenate sample statistics
@@ -102,7 +102,7 @@ if __name__ == "__main__":
   #3.打印当前使用的参数
   print(opt)
 
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  device = torch.device("cuda" if torch.cuda.is_available() else "cpu") #有则用gpu
 
   #4.解析评估数据集的路径和class_names（这个也可以固定？）
   data_config = parse_data_config(opt.data_config)
@@ -113,7 +113,7 @@ if __name__ == "__main__":
   model = Darknet(opt.model_def).to(device)
 
   #6.加载模型的权重
-  if opt_weights_path.endswith(".weights"):
+  if opt.weights_path.endswith(".weights"):
     #加载darknet的权重
     model.load_darknet_weights(opt.weights_path)
   else:
@@ -130,7 +130,7 @@ if __name__ == "__main__":
       conf_thres=opt.conf_thres,
       nms_thres=opt.nms_thres,
       img_size=opt.img_size,
-      batch_size=8
+      batch_size=8,
   )
 
   #8.打印每一种class的评估结果ap
